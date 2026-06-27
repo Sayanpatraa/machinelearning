@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="The Art of Modelling is a course-style machine learning field notebook by Sayan Patra." />
+  <title>The Art of Modelling</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">The Art of Modelling</a>
+    <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="courses.html">Courses</a>
+      <a href="#about">About</a>
+      <a href="#motive">Motive</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Machine Learning Course Notes</p>
+        <h1>A field notebook for modelling, inference, and machine learning foundations.</h1>
+        <p class="hero-text">
+          The Art of Modelling is a research-oriented learning archive: part course,
+          part lab notebook, part derivation map. It studies regression, optimization,
+          assumptions, evaluation, regularization, and the mathematical grammar behind
+          modern machine learning.
+        </p>
+        <div class="research-strip">
+          <div><strong>Focus</strong> First-principles modelling</div>
+          <div><strong>Method</strong> Derivation → implementation → diagnosis</div>
+          <div><strong>Audience</strong> Data science, ML, and research learners</div>
+        </div>
+        <div class="hero-actions">
+          <a class="primary-btn" href="courses.html">Start learning</a>
+          <a class="secondary-btn" href="#overview">View roadmap</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="overview" id="overview">
+      <div class="section-heading">
+        <p class="eyebrow">Course Roadmap</p>
+        <h2>Start with the baseline model, then interrogate every assumption.</h2>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <span>Week 1</span>
+          <h3>Simple Linear Regression</h3>
+          <p>
+            Learn the regression line, residuals, MSE, OLS, gradient descent,
+            assumptions, metrics, and the bias-variance tradeoff.
+          </p>
+          <a href="lessons/simple-linear-regression.html">Open lesson</a>
+        </article>
+
+        <article class="feature-card muted-card">
+          <span>Week 2</span>
+          <h3>Multiple & Polynomial Regression</h3>
+          <p>
+            Extend one-feature regression into many predictors, interaction terms,
+            and nonlinear feature maps.
+          </p>
+        </article>
+
+        <article class="feature-card muted-card">
+          <span>Week 3</span>
+          <h3>Regularisation</h3>
+          <p>
+            Study Ridge, Lasso, Elastic Net, coefficient shrinkage, and model
+            complexity control.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="about-site" id="about">
+      <div class="about-grid">
+        <div class="about-text">
+          <p class="eyebrow">About the Courseer</p>
+          <h2>Built by Sayan Patra as a public modelling notebook</h2>
+          <p>
+            I am a data science and machine learning student with a background in mathematics.
+            My work is shaped by a simple belief: models should not be treated as black boxes
+            before we understand the structure underneath them.
+          </p>
+          <p>
+            This website is my attempt to turn machine learning study into a research habit.
+            Each section is written like a compact investigation: define the problem, derive the
+            model, inspect the assumptions, test the failure modes, and connect the baseline to
+            larger systems.
+          </p>
+        </div>
+
+        <div class="about-card" id="motive">
+          <h3>The Motive</h3>
+          <p>
+            Many students learn machine learning as a sequence of tools. This site treats it
+            as a sequence of research questions. What is the model assuming? What does the
+            objective optimize? Where does inference break? What does the residual structure reveal?
+          </p>
+          <ul>
+            <li>Start with the modelling question.</li>
+            <li>Derive the estimator before using the library call.</li>
+            <li>Connect equations with diagnostics, code, and case studies.</li>
+            <li>Track assumptions, residuals, error, and generalization.</li>
+            <li>Use classical models as the research spine for modern ML.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 Sayan Patra. The Art of Modelling.</p>
+  </footer>
+
+  <script src="assets/script.js"></script>
+</body>
+</html>

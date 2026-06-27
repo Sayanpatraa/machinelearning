@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple Linear Regression | The Art of Modelling</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="logo" href="../index.html">The Art of Modelling</a>
+    <button class="menu-toggle" type="button" aria-label="Toggle navigation">Menu</button>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="../index.html">Home</a>
+      <a href="../courses.html">Courses</a>
+      <a href="../index.html#about">About</a>
+    </nav>
+  </header>
+
+  <main class="exact-lesson-shell">
+    <article class="exact-paper">
+      <header class="exact-paper-header">
+        <p class="eyebrow">Course Module 01</p>
+        <h1>The Art of Modelling — Simple Linear Regression</h1>
+        <p class="paper-meta">Sayan Patra | April 2026</p>
+      </header>
+
+      <pre class="exact-article-text">WEEK 1 | SINGLE LAYER &amp; CLASSICAL ML
+Learning Time &amp; Expectations: Expect to spend around 5–6 days (with daily 1–2 hour sessions) to fully internalize this concept. We assume you have basic knowledge of vectors, matrices, calculus &amp; linear algebra.**
+If you completely understand this you will be ahead in your data science career…
+From First Principles to Production:
+Every skyscraper rests on a foundation. In the world of machine learning and statistical modelling, that foundation is simple linear regression. It is tempting to rush past it — after all, how hard can fitting a line be? But here is the truth that separates practitioners from masters: every neural network layer is a linear transformation followed by a nonlinearity. Every gradient-based optimiser traces its lineage back to the same calculus you will learn today. Regularisation, bias-variance analysis, the normal equations — they all begin here. If you master this week deeply, everything that follows will click into place. If you skim it, you will spend years patching gaps. So let us do this properly — from first principles, with every derivation laid bare, every assumption interrogated, and every insight earned.
+Table of Contents
+What Is Linear Regression? — Intuition First
+The Cost Function — Mean Squared Error (MSE)
+Ordinary Least Squares (OLS) — The Closed-Form Solution
+Gradient Descent — The Iterative Approach
+Assumptions of Linear Regression (Deep Dive)
+Evaluation Metrics — Measuring Model Performance
+The Bias-Variance Tradeoff
+Regularisation Preview
+Case Study: Predicting California Housing Prices
+Key Takeaways
+What’s Coming Next
+References &amp; Further Reading
+1. What Is Linear Regression? — Intuition First
+Imagine you are a real-estate analyst. You have a spreadsheet with two columns: the square footage of every house sold in your county last year, and the price each house fetched. You scatter-plot these points and notice something obvious — bigger houses tend to cost more. The points do not form a perfect line, but there is a clear upward trend. Your job is to draw the single straight line that best captures that trend, so that when a new house hits the market you can plug in its square footage and get a sensible price estimate.
+That line is your linear regression model, and it is described by one of the most important equations in all of statistics:
+ŷ = β₀ + β₁x
+Let us unpack every symbol:
+ŷ (y-hat) — the predicted value of the target variable (e.g., predicted house price). The hat distinguishes it from y, the actual observed value.
+β₀ (beta-zero) — the intercept, sometimes called the bias term. It is the predicted value of y when x = 0. Geometrically, it is where the line crosses the vertical axis.
+β₁ (beta-one) — the slope, also called the weight or coefficient. It tells you how much ŷ changes for a one-unit increase in x. If β₁ = 200, then each additional square foot adds $200 to the predicted price.
+x — the feature, predictor, or independent variable (e.g., square footage).
+Press enter or click to view image in full size
+
+Simple Linear Regression: Interpreting the model ŷ = β₀ + β₁x through the intercept, slope, predicted value, and observed data points.
+Geometric Interpretation
+In feature space, each data point (xᵢ, yᵢ) is a dot on a two-dimensional plane. The regression line sweeps through this cloud of dots, positioned so that the overall vertical distance between the dots and the line is as small as possible. In higher dimensions (multiple regression), this “line” generalises to a hyperplane, but the principle is identical.
+Beginner’s Corner
+Think of the regression line as a taut rubber band laid across your scatter plot. Gravity pulls the band towards every data point. The position where the band naturally settles — balancing all those pulls — is approximately where the best-fit line lives.
+The goal is deceptively simple: find the values of β₀ and β₁ that minimise the total distance between our predicted values (ŷ) and the actual observed values (y). But “distance” needs a precise definition — and that brings us to the cost function.
+2. The Cost Function — Mean Squared Error (MSE)
+For each data point i, the residual (or error) is the gap between the actual value and our prediction:
+eᵢ = yᵢ − ŷᵢ = yᵢ − (β₀ + β₁xᵢ)
+We want all residuals to be small. But we cannot simply add them up — positive and negative residuals would cancel out, giving a misleadingly small total. Two natural fixes exist:
+Take absolute values: Σ|eᵢ|. This works intuitively, but the absolute-value function has a sharp corner at zero and is not differentiable everywhere, making calculus-based optimisation harder.
+Square the residuals: Σeᵢ². Squaring is smooth, differentiable everywhere, and has a bonus: it penalises large errors disproportionately. A residual of 10 contributes 100 to the sum, but a residual of 2 contributes only 4. This is usually desirable because large prediction errors are typically much worse than small ones.
+We choose squaring and average over all n data points to get the Mean Squared Error:
+J(β₀, β₁) = (1/n) Σᵢ₌₁ⁿ (yᵢ − β₀ − β₁xᵢ)²
+This function J is our cost function (also called the loss function or objective function). Our entire task reduces to: find β₀ and β₁ that minimise J.
+The Cost Surface
+Visualise J as a surface hovering over the (β₀, β₁) plane. For every pair of parameter values, J gives a height — the average squared error. Because J is a sum of squared terms (each quadratic in β₀ and β₁), the surface is a convex paraboloid: a smooth, bowl-shaped surface with a single lowest point.
+
+Pro Tip
+Convexity is a gift. It guarantees that any local minimum is also the global minimum. This means gradient descent (Section 4) will always converge to the optimal solution for linear regression, regardless of where we start. Many advanced models (neural networks, for instance) lose this guarantee — one reason linear regression remains a gold-standard baseline.
+3. Ordinary Least Squares (OLS) — The Closed-Form Solution
+Because J is a smooth, convex function of β₀ and β₁, we can find its minimum analytically by setting the partial derivatives to zero. This classical approach is called Ordinary Least Squares.
+3.1 Scalar Derivation (Two Parameters)
+Step 1 — Write out the cost function:
+J(β₀, β₁) = (1/n) Σᵢ₌₁ⁿ (yᵢ − β₀ − β₁xᵢ)²
+Step 2 — Partial derivative with respect to β₀:
+∂J/∂β₀ = (1/n) Σᵢ₌₁ⁿ 2(yᵢ − β₀ − β₁xᵢ)(−1) = −(2/n) Σᵢ₌₁ⁿ (yᵢ − β₀ − β₁xᵢ)
+Set this equal to zero:
+Σ (yᵢ − β₀ − β₁xᵢ) = 0
+Σ yᵢ − nβ₀ − β₁ Σ xᵢ = 0
+nȳ − nβ₀ − β₁ · nx̄ = 0
+β₀ = ȳ − β₁x̄ … (Normal Equation 1)
+Step 3 — Partial derivative with respect to β₁:
+∂J/∂β₁ = (1/n) Σᵢ₌₁ⁿ 2(yᵢ − β₀ − β₁xᵢ)(−xᵢ) = −(2/n) Σᵢ₌₁ⁿ xᵢ(yᵢ − β₀ − β₁xᵢ)
+Set to zero:
+Σ xᵢ(yᵢ − β₀ − β₁xᵢ) = 0
+Σ xᵢyᵢ − β₀ Σ xᵢ − β₁ Σ xᵢ² = 0
+Step 4 — Substitute Normal Equation 1 (β₀ = ȳ − β₁x̄) into the equation above:
+Σ xᵢyᵢ − (ȳ − β₁x̄) Σ xᵢ − β₁ Σ xᵢ² = 0
+Σ xᵢyᵢ − ȳ Σ xᵢ + β₁x̄ Σ xᵢ − β₁ Σ xᵢ² = 0
+Σ xᵢyᵢ − nȳx̄ = β₁ (Σ xᵢ² − nx̄²)
+Σ (xᵢ − x̄)(yᵢ − ȳ) = β₁ · Σ (xᵢ − x̄)²
+β₁ = Σ (xᵢ − x̄)(yᵢ − ȳ) / Σ (xᵢ − x̄)² = Cov(X, Y) / Var(X)
+And from Normal Equation 1:
+β₀ = ȳ − β₁x̄
+Beginner’s Corner
+What does β₁ = Cov(X,Y)/Var(X) actually mean?
+The covariance measures how X and Y move together. The variance of X measures how spread out X is. Dividing one by the other answers: “For each unit of spread in X, how much does Y move with it?” That is exactly the slope.
+3.2 Matrix Formulation
+For computational elegance and generalisation to multiple regression, we rewrite everything in matrix form. Stack all observations into vectors and matrices:
+Let y = [y₁, y₂, …, yₙ]ᵀ (n × 1 vector of targets)
+Let X = a matrix where row i is [1, xᵢ] (n × 2 design matrix, the column of 1s handles the intercept)
+Let β = [β₀, β₁]ᵀ (2 × 1 parameter vector)
+The model becomes ŷ = Xβ, and the cost function in matrix form is:
+J(β) = (1/n)(y − Xβ)ᵀ(y − Xβ)
+Expand the product:
+J(β) = (1/n)(yᵀy − yᵀXβ − βᵀXᵀy + βᵀXᵀXβ)
+Since yᵀXβ is a scalar, it equals its transpose: βᵀXᵀy
+J(β) = (1/n)(yᵀy − 2βᵀXᵀy + βᵀXᵀXβ)
+Take the gradient with respect to β (using matrix calculus identities: ∇β(βᵀa) = a and ∇β(βᵀAβ) = 2Aβ for symmetric A):
+∇β J = (1/n)(−2Xᵀy + 2XᵀXβ)
+Set the gradient to zero:
+XᵀXβ = Xᵀy
+These are the famous Normal Equations. Solving for β:
+β = (XᵀX)⁻¹Xᵀy
+Important: Invertibility Condition
+The matrix XᵀX must be invertible (i.e., full rank) for this solution to exist. This fails when columns of X are linearly dependent — a symptom of perfect multicollinearity. In practice, near-multicollinearity (high correlation between features) makes XᵀX nearly singular, causing numerically unstable estimates with huge variances. Regularisation (Section 8) is the remedy.
+3.3 Computational Complexity
+Computing (XᵀX)⁻¹Xᵀy requires O(n·p²) for the matrix multiplication XᵀX (where p is the number of features) and O(p³) for the inversion. For simple linear regression (p = 2), this is trivial. But when p is in the tens of thousands (e.g., text data with bag-of-words features), inverting a p × p matrix becomes prohibitively expensive — motivating iterative methods like gradient descent.
+4. Gradient Descent — The Iterative Approach
+When the dataset is massive or the feature space is high-dimensional, the O(p³) cost of matrix inversion becomes a bottleneck.
+Gradient descent offers an iterative alternative: instead of solving for the minimum analytically, we walk downhill on the cost surface, step by step, until we reach the bottom of the bowl.
+4.1 The Algorithm
+Initialise: Set β₀ and β₁ to some starting values (zeros, random values, or a heuristic).
+Repeat until convergence:
+Compute the gradients:
+∂J/∂β₀ = −(2/n) Σᵢ₌₁ⁿ (yᵢ − β₀ − β₁xᵢ)
+∂J/∂β₁ = −(2/n) Σᵢ₌₁ⁿ xᵢ · (yᵢ − β₀ − β₁xᵢ)
+Update the parameters simultaneously:
+β₀ := β₀ − α · ∂J/∂β₀
+β₁ := β₁ − α · ∂J/∂β₁
+Here, α (alpha) is the learning rate — a small positive number that controls the step size.
+Beginner’s Corner
+Picture yourself blindfolded on a hilly landscape. You can feel the slope of the ground under your feet. Gradient descent says: “Take a step in the direction where the ground slopes downward most steeply.” Repeat. Eventually you reach the valley floor. The learning rate is your step size — too big and you overshoot the valley; too small and you take forever to get there.
+4.2 The Learning Rate — Getting It Right
+Learning Rate Behaviour Symptom Too large (e.g., α = 10)
+Parameters overshoot the minimum, oscillate, or diverge to infinityCost function increases with each iterationToo small (e.g., α = 10⁻⁸)
+Convergence is extremely slow — thousands of iterations for trivial progressCost decreases but barely changes between iterations
+Just right (e.g., α = 0.01)Smooth, steady decrease in cost; convergence within a reasonable number of iterations
+Cost curve shows a clean, monotonically decreasing shape
+4.3 Convergence Criteria
+Common stopping rules include:
+(a) the change in J between iterations falls below a threshold ε (e.g., 10⁻⁶);
+(b) the magnitude of the gradient falls below ε; or
+(c) a maximum number of iterations is reached.
+4.4 Variants of Gradient Descent
+Variant Data Used Per Step Update Noise Speed Per Epoch
+Best For:
+Batch GD All n data pointsNone (exact gradient)Slow for large n Small datasets, guaranteed convergence
+Stochastic GD (SGD) 1 random data point High (noisy gradient)Very fast per stepVery large datasets, online learning
+Mini-Batch GDA random batch of b points (e.g., 32 or 64)Moderate Good balance Deep learning, GPU parallelism
+4.5 Feature Scaling
+When features are on wildly different scales (e.g., square footage in thousands vs. number of bedrooms in single digits), the cost surface becomes a narrow, elongated ellipse rather than a nice circle. Gradient descent zigzags inefficiently down the narrow valley.
+Feature scaling fixes this:
+Standardisation (Z-score): x’ = (x − μ) / σ. Centers data at mean 0, scales to unit variance.
+Min-Max Normalisation: x’ = (x − x_min) / (x_max − x_min). Rescales to [0, 1].
+Pro Tip
+Feature scaling is critical for gradient descent but irrelevant for OLS. The closed-form solution handles unscaled features perfectly because it solves the system directly. If you are using gradient descent, always scale first.
+4.6 OLS vs. Gradient Descent — When to Use Which
+Aspect OLS (Closed‑Form Solution) Gradient Descent
+Dataset size: Works well for any n when features are few; becomes slow when p is largePreferred when n is very large because it avoids matrix inversion
+Feature count: Computationally expensive when p &gt; ~10,000 due to (XTX)−1 which is O(p3)Scales efficiently to high‑dimensional data; each iteration is cheap
+Hyperparameters: None — gives a direct analytical solutionRequires tuning learning rate α, batch size, and number of iterations
+Exactness of solution: Yes — exact up to numerical precisionApproximate — depends on convergence behavior
+Generalization to other models: Limited to linear regression and ridge regression variantsUniversal — works for any differentiable cost function (logistic regression, neural nets, etc.)
+5. Assumptions of Linear Regression — A Deep Dive
+Linear regression is not magic — it comes with a contract. If the assumptions below hold, OLS estimates are the Best Linear Unbiased Estimators (BLUE), as guaranteed by the Gauss-Markov theorem. When they are violated, the estimates may be biased, inefficient, or misleading.
+5.1 Linearity
+What it means: The true relationship between X and Y is linear (or at least well-approximated by a line).
+Why it matters: If the real relationship is a curve, a straight line will systematically miss the pattern, producing biased predictions.
+How to test: Plot residuals vs. fitted values. If you see a curve or funnel shape, linearity is violated. The Rainbow test provides a formal statistical check.
+If violated: Add polynomial features (x², x³), apply log or square-root transformations, or switch to a nonlinear model.
+5.2 Independence of Errors
+What it means: The residual for observation i tells you nothing about the residual for observation j. Each error is its own draw.
+Why it matters: Correlated errors (common in time-series data) cause standard errors to be underestimated, leading to overconfident hypothesis tests.
+How to test: The Durbin-Watson test detects first-order autocorrelation. Values near 2 indicate independence; near 0 or 4 indicate positive or negative autocorrelation.
+If violated: Use time-series models (ARIMA), add lagged variables, or use Newey-West standard errors.
+5.3 Homoscedasticity
+What it means: The variance of the residuals is constant across all levels of X (the errors do not “fan out”).
+Why it matters: Heteroscedasticity does not bias β estimates, but it does invalidate standard errors, confidence intervals, and hypothesis tests.
+How to test: Residuals vs. fitted plot (look for a funnel shape); Breusch-Pagan test; Goldfeld-Quandt test.
+If violated: Weighted Least Squares (WLS), robust standard errors (HC0–HC3), or log-transforming the target variable.
+5.4 Normality of Residuals
+What it means: The errors ε are drawn from a normal (Gaussian) distribution.
+Why it matters: Normality is required for valid confidence intervals and p-values in small samples. With large samples, the Central Limit Theorem makes inference approximately valid even without normality.
+How to test: Q-Q plot (points should follow a 45° line); Shapiro-Wilk test; histogram of residuals.
+Write on Medium
+If violated: Transform the target (Box-Cox), use bootstrapped confidence intervals, or increase sample size.
+5.5 No Multicollinearity
+What it means: No predictor is a near-perfect linear combination of other predictors. (Strictly relevant in multiple regression, but the concept is introduced here.)
+Why it matters: High multicollinearity inflates the variance of coefficient estimates, making them unstable and hard to interpret.
+How to test: Compute the Variance Inflation Factor (VIF) for each predictor. VIF &gt; 5–10 signals a problem. Also inspect the correlation matrix.
+If violated: Remove correlated features, combine them via PCA, or use Ridge regression (L2 regularisation).
+5.6 No Endogeneity
+What it means: E[ε | X] = 0 — the errors are uncorrelated with the predictors. Formally, there are no omitted variables that are correlated with both X and Y.
+Why it matters: Endogeneity biases the OLS estimates, meaning you cannot trust the coefficients for causal interpretation.
+If violated: Instrumental Variables (IV) estimation, Two-Stage Least Squares (2SLS), or adding the omitted variable if possible.
+Common Pitfall
+Many beginners check normality and homoscedasticity but forget about endogeneity. If your goal is causal inference (not just prediction), endogeneity is the most dangerous assumption to violate — and the hardest to test for.
+
+6. Evaluation Metrics — Measuring Model Performance
+A model is only as good as our ability to measure how well it performs. Below are the essential regression metrics, each with its formula, interpretation, and trade-offs.
+6.1 R² — Coefficient of Determination
+R² = 1 − (SSres / SStot)
+where SSres = Σ(yᵢ − ŷᵢ)² and SStot = Σ(yᵢ − ȳ)²
+Interpretation: R² tells you the proportion of variance in Y explained by the model.
+An R² of 0.85 means 85% of the variability in the target is captured by the line; the remaining 15% is unexplained noise. Range: 0 to 1 for a reasonable model (can technically be negative if the model is worse than predicting the mean).
+Key insight for simple linear regression: R² equals the square of the Pearson correlation coefficient r. If r = 0.9, then R² = 0.81.
+6.2 Adjusted R²
+Adjusted R² = 1 − [(1 − R²)(n − 1) / (n − p − 1)]
+R² never decreases when you add a new feature — even a useless one.
+Adjusted R² penalises model complexity by accounting for the number of predictors p.
+If a new feature does not improve the model enough to justify the lost degree of freedom, Adjusted R² will decrease even as R² ticks up. Always use Adjusted R² when comparing models with different numbers of features.
+6.3 MSE, RMSE, MAE, and MAPE
+Metric Formula Units Outlier Sensitivity Interpretation
+MSE(1/n) Σ(yᵢ − ŷᵢ)² : Squared units (e.g., $²)
+High — large errors are squared
+Average squared prediction error. Hard to interpret directly due to squared units.
+RMSE√MSE : Same as target (e.g., $)
+High (inherits from MSE)Standard deviation of prediction errors.
+The most common regression metric — directly comparable to the target scale.
+MAE(1/n) Σ|yᵢ − ŷᵢ| : Same as target
+Low — treats all errors linearlyAverage magnitude of errors.
+More robust to outliers. Represents the median absolute error expectation.
+MAPE(100/n) Σ|yᵢ − ŷᵢ|/|yᵢ|: Percentage Undefined when yᵢ = 0
+Average percentage error.
+Scale-independent — useful for comparing across datasets. Explodes when actuals are near zero.
+Pro Tip
+Use RMSE as your default metric for reporting. Use MAE if your dataset has significant outliers that you do not want to dominate the evaluation. Use MAPE only when you need scale-free comparison and your target values are well away from zero.
+7. The Bias-Variance Tradeoff
+This is arguably the single most important concept in all of statistical learning. It explains why models fail and how to choose the right level of complexity.
+7.1 Definitions
+Bias: Error from oversimplifying the model. A model with high bias “misses the point” — it cannot capture the true pattern even with infinite training data. This is underfitting.
+Variance: Error from the model being too sensitive to the specific training data. A model with high variance fits the training set perfectly but performs poorly on new data because it has memorised noise. This is overfitting.
+Irreducible error (σ²): The noise inherent in the data itself. No model can eliminate it.
+7.2 The Decomposition
+For a new test point x₀, the expected prediction error can be decomposed as:
+E[(y − ŷ)²] = Bias(ŷ)² + Var(ŷ) + σ²
+Derivation sketch:
+Let y = f(x₀) + ε where E[ε] = 0 and Var(ε) = σ²
+E[(y − ŷ)²] = E[(f(x₀) + ε − ŷ)²]
+= E[(f(x₀) − ŷ)² + 2ε(f(x₀) − ŷ) + ε²]
+= E[(f(x₀) − ŷ)²] + 0 + σ² (since ε is independent of ŷ and E[ε]=0)
+Now decompose E[(f(x₀) − ŷ)²] by adding and subtracting E[ŷ]:
+= E[(f(x₀) − E[ŷ] + E[ŷ] − ŷ)²]
+= (f(x₀) − E[ŷ])² + E[(ŷ − E[ŷ])²] + 2(f(x₀) − E[ŷ])E[ŷ − E[ŷ]]
+= (f(x₀) − E[ŷ])² + Var(ŷ) + 0
+= Bias(ŷ)² + Var(ŷ) + σ²
+7.3 Application to Linear Regression
+
+Simple linear regression (ŷ = β₀ + β₁x): If the true relationship is nonlinear, this model has high bias (it cannot capture the curve) but low variance (a line does not wiggle much between different training sets). This is underfitting.
+High-degree polynomial regression (ŷ = β₀ + β₁x + β₂x² + … + β₁₀x¹⁰): Very flexible — low bias — but it will fit the noise in the training data, leading to high variance. This is overfitting.
+The sweet spot: A model complex enough to capture the true signal but simple enough to ignore the noise. Finding this balance is the central challenge of machine learning.
+Important
+The bias-variance tradeoff is why we always evaluate on a held-out test set (or via cross-validation), never on the training set alone. A training-set metric tells you about bias. A test-set metric reveals the combined effect of bias and variance.
+8. Regularisation Preview
+Regularisation is a technique to combat overfitting by penalising large coefficient values. It adds a term to the cost function that discourages the model from becoming too complex.
+Ridge Regression (L2 Regularisation)
+JRidge(β) = (1/n) Σ(yᵢ − ŷᵢ)² + λ Σ βⱼ²
+The penalty λΣβⱼ² shrinks coefficients towards zero but never exactly to zero. This reduces variance at the cost of a small increase in bias. The hyperparameter λ controls the strength of the penalty.
+Lasso Regression (L1 Regularisation)
+JLasso(β) = (1/n) Σ(yᵢ − ŷᵢ)² + λ Σ |βⱼ|
+The L1 penalty can shrink some coefficients exactly to zero, effectively performing feature selection. This is invaluable when you suspect many features are irrelevant.
+Looking Ahead
+We will dive deeply into Ridge, Lasso, and Elastic Net regularisation in a future week of this series. For now, remember the core idea: adding a complexity penalty to the cost function trades a small increase in bias for a large reduction in variance, often improving generalisation.
+9. Case Study: Predicting California Housing Prices
+Theory is essential, but nothing cements understanding like working through a real dataset. Let us apply everything we have learned to the California Housing dataset, a widely used benchmark in machine learning.
+9.1 Problem Statement
+Predict the median house value (in hundreds of thousands of dollars) for California census block groups using available socioeconomic and geographic features.
+9.2 Dataset Overview
+Property Detail Source 1990 U.S. Census (via scikit-learn’s fetch_california_housing)
+Observations: 20,640 census block groups
+Features (8 total): MedInc, HouseAge, AveRooms, AveBedrms, Population, AveOccup, Latitude, Longitude
+Target: MedHouseVal — median house value ($100,000s)
+9.3 Exploratory Data Analysis (EDA)
+Summary Statistics:
+Summary Statistics Table:
+Feature                Mean Std Dev Min  Median Max
+MedInc                 3.87  1.90   0.50 3.53   15.00
+HouseAge               28.64 12.59  1.00 29.00  52.00
+AveRooms               5.43  2.47   0.85 5.23   141.91
+MedHouseVal (Target)   2.07  1.15   0.15 1.80   5.00
+Correlation Analysis: The feature most strongly correlated with MedHouseVal is MedInc (median income), with a Pearson correlation of approximately r = 0.69. This makes intuitive sense — wealthier neighbourhoods have more expensive houses. We will use MedInc as our single predictor for simple linear regression.
+9.4 Data Preprocessing
+Missing values: The California Housing dataset has no missing values, so no imputation is needed.
+Feature scaling: For OLS, scaling is not required. For gradient descent, we standardise MedInc to zero mean and unit variance.
+Train-test split: 80% training (16,512 observations) / 20% test (4,128 observations), with a fixed random seed for reproducibility.
+9.5 Model Building
+We fit simple linear regression using MedInc as the sole predictor:
+MedHouseVal = β₀ + β₁ × MedInc
+Fitted equation (representative OLS result):
+MedHouseVal ≈ 0.45 + 0.42 × MedInc
+Coefficient interpretation:
+β₁ ≈ 0.42: For every one-unit increase in median income (approximately $10,000), the predicted median house value increases by about $42,000. This is a powerful, interpretable insight.
+β₀ ≈ 0.45: A block group with zero median income would have a predicted house value of ~$45,000. (This is an extrapolation beyond the data range and should not be taken literally.)
+9.6 Model Evaluation
+Metric Training Set Test Set
+R²        0.473     0.467
+RMSE      0.839     0.844
+MAE       0.641     0.645
+Interpretation: The model explains roughly 47% of the variance in house values — respectable for a single feature, but clearly leaving a lot on the table. The train and test metrics are very close, indicating no overfitting (low variance), but the R² of 0.47 suggests moderate bias — a single straight line cannot capture all the patterns in housing prices.
+9.7 Residual Analysis
+Residuals vs. Fitted: A plot would reveal some non-random patterns — residuals tend to be larger for higher predicted values, suggesting mild heteroscedasticity and possible nonlinearity.
+Q-Q Plot: The residuals deviate from normality in the tails (heavier than Gaussian), reflecting the skewed nature of housing prices and the hard cap at MedHouseVal = 5.0 in the dataset.
+Assumption check summary: Linearity is approximate but not perfect; homoscedasticity is mildly violated; normality of residuals is approximate. These observations motivate more sophisticated approaches.
+9.8 Key Findings
+Median income is the single strongest predictor of house values, explaining ~47% of variance on its own.
+The model is simple, interpretable, and does not overfit — but it underfits because housing prices depend on many factors (location, house age, supply, etc.).
+Adding more features (multiple regression) and capturing nonlinear effects (polynomial terms) would significantly improve performance — exactly what we will tackle in Week 2.
+Pro Tip
+A simple linear regression model is the perfect baseline. Before training any complex model (random forest, neural network, etc.), always fit a linear regression first. If your fancy model cannot beat this baseline, something is wrong with your pipeline — not your model choice.
+10. Key Takeaways
+Linear regression is foundational — not trivial. The mathematics of OLS, gradient descent, and the bias-variance tradeoff underpin nearly every advanced model in machine learning.
+The OLS closed-form solution β = (XᵀX)⁻¹Xᵀy is elegant but limited to cases where XᵀX is invertible and p is not too large.
+Gradient descent is the general-purpose optimiser that scales to any dataset size and any differentiable cost function — the engine of deep learning.
+The MSE cost function is convex for linear regression, guaranteeing a unique global minimum. This is a luxury not available to most nonlinear models.
+Always check assumptions — linearity, independence, homoscedasticity, normality, no multicollinearity, no endogeneity. Violations do not necessarily mean the model is useless, but they change what you can infer from it.
+R² is not enough. A high R² does not mean the model is good; a low R² does not mean it is useless. Always examine residual plots and use multiple metrics.
+The bias-variance tradeoff is the central tension in modelling: simplicity (bias) vs. flexibility (variance). The goal is always generalisation, not memorisation.
+Common Beginner Mistakes
+Not plotting the data first. Always visualise before modelling. A scatter plot takes seconds and can save hours of debugging.
+Using R² on the training set alone. This tells you nothing about how the model will perform on new data.
+Forgetting to check residual plots. Coefficient values and R² can look fine even when assumptions are badly violated.
+Applying gradient descent without feature scaling. This leads to painfully slow convergence or divergence.
+Confusing correlation with causation. A strong β₁ means X and Y move together — not that X causes Y.
+Extrapolating beyond the data range. The linear relationship is only validated within the observed range of X. Beyond that, all bets are off.
+When to Use and When NOT to Use : Linear Regression
+Use Linear Regression When…
+The relationship is approximately linear — the signal follows a straight‑line trend and residuals don’t show systematic curvature.
+Interpretability is paramount — regulatory, medical, policy, or audit‑heavy contexts where coefficients must be explainable.
+You need a fast, reliable baseline — OLS gives a quick benchmark for more complex models.
+Assumptions are reasonably met — or you understand the violations and have mitigation strategies (e.g., transformations, robust SEs).
+Data dimensionality is moderate — feature count is manageable and multicollinearity is low or controlled.
+Avoid Linear Regression When…
+The relationship is clearly nonlinear — and transformations or feature engineering cannot linearize it.
+Prediction accuracy is the sole goal — and you have enough data to justify more flexible models (trees, ensembles, neural nets).
+The target is categorical — use logistic regression or other classifiers instead.
+Strong multicollinearity exists — and you are not using any regularization strategy (Ridge, Lasso, Elastic Net).
+Assumptions are severely violated — e.g., heteroscedasticity, autocorrelation, non-normal residuals, or endogeneity.
+11. What’s Coming Next
+Week 2: Multiple &amp; Polynomial Regression — We remove the single-feature constraint and learn to fit models with many predictors simultaneously. We will extend the matrix formulation to p features, derive the multivariate normal equations, explore interaction terms and polynomial features, and confront the curse of dimensionality. We will also revisit the California Housing dataset with all 8 features and see how much performance improves.
+Everything from this week — the cost function, gradient descent, assumptions, metrics, bias-variance — carries forward directly. You have built the foundation.
+Now we build upward.
+12. References &amp; Further Reading
+Textbooks:
+James, G., Witten, D., Hastie, T., &amp; Tibshirani, R. (2021). An Introduction to Statistical Learning (2nd ed.). Springer. — Chapter 3 covers linear regression with exceptional clarity. Freely available online.
+Hastie, T., Tibshirani, R., &amp; Friedman, J. (2009). The Elements of Statistical Learning (2nd ed.). Springer. — A more advanced treatment; Chapter 3 on linear methods for regression is essential for graduate-level understanding.
+Bishop, C. M. (2006). Pattern Recognition and Machine Learning. Springer. — Chapter 3 (Linear Models for Regression) provides a Bayesian perspective on linear regression.
+Historical Foundations:
+Galton, F. (1886). “Regression Towards Mediocrity in Hereditary Stature.” Journal of the Anthropological Institute of Great Britain and Ireland, 15, 246–263. — The paper that gave “regression” its name, documenting how children’s heights regress toward the population mean.
+Pearson, K. (1896). “Mathematical Contributions to the Theory of Evolution — III. Regression, Heredity, and Panmixia.” Philosophical Transactions of the Royal Society A, 187, 253–318. — Pearson formalised Galton’s ideas into the correlation coefficient and least-squares regression as we know them today.
+Legendre, A. M. (1805). Nouvelles méthodes pour la détermination des orbites des comètes. — Contains the first published account of the method of least squares, developed independently of Gauss.
+Gauss, C. F. (1809). Theoria Motus Corporum Coelestium. — Gauss claimed to have used least squares as early as 1795; this work provides his full derivation.
+Online Resources:
+Scikit-learn documentation: California Housing Dataset — sklearn.datasets.fetch_california_housing
+Stanford CS229 (Andrew Ng) — Lecture notes on supervised learning and linear regression
+3Blue1Brown — “Essence of Linear Algebra” video series for matrix intuition
+“All models are wrong, but some are useful.”
+— George E. P. Box, 1976
+The Art of Modelling
+Sayan Patra| April 2026
+**
+If you plan to revisit vectors, matrices, calculus, and linear algebra for Data Science, our upcoming refresher will guide you through the essential concepts.</pre>
+    </article>
+  </main>
+
+  <script src="../assets/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Course-style module library for The Art of Modelling." />
+  <title>Courses | The Art of Modelling</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">The Art of Modelling</a>
+    <button class="menu-button" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+    <nav class="nav-links" aria-label="Main navigation">
+      <a href="index.html">Home</a>
+      <a href="courses.html">Courses</a>
+      <a href="index.html#about">About</a>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-intro">
+      <p class="eyebrow">Course Library</p>
+      <h1>Modelling Foundations</h1>
+      <p>
+        Each module is organized like a research note: motivation, mathematical object,
+        estimator, optimization route, assumptions, diagnostics, and applied case study.
+      </p>
+    </section>
+
+    <section class="course-motive">
+      <h2>Why this course-style course exists</h2>
+      <p>
+        The Art of Modelling is designed for learners who want to read models the way researchers read systems. Regression, optimization, assumptions, and evaluation are not separate boxes. They are one argument about how data becomes evidence.
+      </p>
+      <p>
+        We begin with simple linear regression because it exposes the recurring anatomy of machine learning: prediction, residuals, loss functions, parameter estimation, gradients, assumptions, bias, variance, and diagnostic evidence.
+      </p>
+    </section>
+
+    <section class="course-list" aria-label="Course modules">
+      <a class="course-module" href="lessons/simple-linear-regression.html">
+        <div>
+          <span class="module-label">Week 1</span>
+          <h2>Simple Linear Regression</h2>
+          <p>
+            The foundation of modelling: fitting a line, minimizing error,
+            deriving OLS, and understanding gradient descent.
+          </p>
+        </div>
+        <span class="module-arrow" aria-hidden="true">→</span>
+      </a>
+
+      <div class="course-module disabled">
+        <div>
+          <span class="module-label">Week 2</span>
+          <h2>Multiple & Polynomial Regression</h2>
+          <p>Coming next.</p>
+        </div>
+      </div>
+
+      <div class="course-module disabled">
+        <div>
+          <span class="module-label">Week 3</span>
+          <h2>Regularisation</h2>
+          <p>Coming next.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 Sayan Patra. The Art of Modelling.</p>
+  </footer>
+
+  <script src="assets/script.js"></script>
+</body>
+</html>
